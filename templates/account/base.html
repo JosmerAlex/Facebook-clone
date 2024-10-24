@@ -1,0 +1,30 @@
+{% load tailwind_tags %}
+
+<html>
+  <head>
+    {% tailwind_css %}
+    <title>{% block head_title %}{% endblock %}</title>
+    {% block extra_head %}
+    {% endblock %}
+  </head>
+  <body>
+    {% block body %}
+
+    {% if messages %}
+    <div>
+        {% for message in messages %}
+            <div class="p-4 mb-4 mt-3 mr-3 ml-3 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+                <span class="font-medium">Info alert! </span>{{message}}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+
+    {% block content %}
+    {% endblock %}
+    {% endblock %}
+    {% block extra_body %}
+    {% endblock %}
+  </body>
+</html>

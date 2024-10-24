@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load tailwind_filters %}
+
+{% load humanize %}
+
+{% block extra_head %}{% endblock extra_head %}
+
+<!-- NAVBAR -->
+{% block navbar %}
+{% include 'components/navbar.html' %}
+{% endblock navbar %}
+
+
+<!-- MAIN -->
+<!-- left sidebar -->
+{% block left_sidebar %}
+{% include 'components/sidebars/left/sidebar.html' %}
+{% endblock left_sidebar %}
+
+<!-- main content -->
+{% block content %}
+<div
+    class="bg-white dark:bg-dark-third max-w-full px-4 py-5 border-b rounded-lg mb-2 dark:border-dark-second border-gray-200 sm:px-6">
+
+    <h3 class="text-xl leading-6 cursor-default dark:text-dark-txt prose rounded font-bold text-gray-900">
+        Post Details
+    </h3>
+
+    <p class="mt-1 text-sm cursor-default dark:text-dark-txt text-gray-500">
+        This is a post detail view, you can see the content, comment and share your thoughts on this topic.
+        Hint: Add a comment by clicking in the button below that says <span class="font-bold">Comment</span>
+    </p>
+</div>
+<div class="bg-white max-w-full dark:bg-dark-second shadow px-4 py-5 sm:rounded-lg sm:p-6 post" id="content_posts"
+    data-id="">
+    <!-- POST AUTHOR -->
+    <input type="hidden" name="post_id" id="post_id" value="{{object.id}}">
+    <input type="hidden" name="user" id="user" value="{{request.user.id}}">
+    <div class="flex items-center justify-between px-4 py-2">
+        <div class="flex space-x-2 items-center">
+            <a href="{% url 'accounts:profile' object.author.username %}" class="relative">
+                <img src="{{ object.author.profile.image.url }}" alt="Profile picture" class="w-10 h-10 rounded-full">
+                <span class="bg-green-500 w-3 h-3 rounded-full absolute right-0 top-6 border-white border-2"></span>
+            </a>
+            <div>
+                <div class="font-semibold dark:text-dark-txt hover:text-indigo-500">
+                    <a href="{% url 'accounts:profile' object.author.username %}">
+                        {% if object.author.first_name %}
+                        {{ object.author.first_name }} {{object.author.last_name}}
+                        {% else %}
+                        {{object.author.username}}
+                        {% endif %}
+                    </a>
+                </div>
+                <span class="text-sm text-gray-500">{{object.created_on|naturaltime}}</span>
+            </div>
+        </div>
+
+        {% if request.user == object.author %}
+        <!-- This example requires Tailwind CSS v2.0+ -->
+        <div x-data="{open: false}" class="relative inline-block text-left">
+            <div @click="open=true"
+                class="w-8 h-8 grid place-items-center text-xl text-gray-500 hover:bg-gray-200 dark:text-dark-txt dark:hover:bg-dark-third rounded-full cursor-pointer">
+                <i class='bx bx-dots-vertical-rounded'></i>
+            </div>
+            <div x-show="open"
+                class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md dark:bg-dark-second bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="transform opacity-0 scale-95"
+                x-transition:enter-end="transform opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-75"
+                x-transition:leave-start="transform opacity-100 scale-100"
+                x-transition:leave-end="transform opacity-0 scale-95" @click.away="open=false">
+                <div class="py-1" role="none">
+                    <!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
+                    <a href="{% url 'social:post_edit' object.id %}"
+                        class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 dark:text-dark-txt dark:hover:bg-dark-third"
+                        role="menuitem" tabindex="-1" id="menu-item-0"><i class='bx bxs-edit-alt'></i> Edit</a>
+                    <a href="{% url 'social:post_delete' object.id %}"
+                        class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 dark:text-dark-txt dark:hover:bg-dark-third"
+                        role="menuitem" tabindex="-1" id="menu-item-1"><i class='bx bxs-trash-alt'></i> Delete</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <!-- END POST AUTHOR -->
+
+    <!-- POST CONTENT -->
+    <div class="body text-justify px-4 py-2 dark:text-dark-txt">
+        <h3 class="text-lg leading-6 font-medium dark:text-dark-txt text-gray-900">
+            {{object.title}}
+        </h3>
+        {{object.body}}
+    </div>
+    <!-- END POST CONTENT -->
+
+    <!-- POST IMAGE -->
+    {% if object.image.count == 1 %}
+    <div class="grid place-items-center rounded-2xl border border-gray-200 dark:border-dark-third">
+        {% for img in object.image.all %}
+        <img src="{{img.image.url}}" class="rounded-md h-full w-full object-cover object-center bg-gray-100"
+            alt="Post image">
+        {% endfor %}
+    </div>
+    {% endif %}
+    <!-- END POST IMAGE -->
+
+    <!-- POST MULTIPLE IMAGE -->
+    {% if object.image.count > 1 %}
+    <div class="rounded-2xl border border-gray-200 dark:border-dark-third">
+        <div class="grid grid-cols-2 gap-1 place-items-center">
+            {% for img in object.image.all %}
+            <img src="{{ img.image.url }}" class="rounded-md h-full w-max object-cover object-center bg-gray-100"
+                alt="Post image">
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    <!-- END POST IMAGE -->
+
+    <!-- POST REACT -->
+    <div class="px-4 py-2">
+        <div class="flex items-center gap-4">
+            <div class="flex flex-row-reverse items-center">
+                <span class="text-xs ml-2 text-gray-500 dark:text-dark-txt like_count">{{object.likes.all.count}}</span>
+                <div class="rounded-full grid place-items-center text-xl -ml-1 text-blue-500">
+                    <i class='bx bxs-like'></i>
+                </div>
+            </div>
+            <div class="flex flex-row-reverse items-center">
+                <span class="text-xs ml-2 text-gray-500 dark:text-dark-txt dislike_count">{{object.dislikes.all.count}}
+                </span>
+                <div class="rounded-full grid place-items-center text-xl -ml-1 text-red-500">
+                    <i class='bx bxs-dislike'></i>
+                </div>
+
+            </div>
+            <div class="flex flex-row-reverse right-0">
+                <span class="text-xs ml-2 text-gray-500 dark:text-dark-txt">{{object.post_comment.all.count}}
+                    Comments</span>
+            </div>
+        </div>
+    </div>
+    <!-- END POST REACT -->
+    <div x-data="{open:false}">
+        <!-- POST ACTION -->
+        <div class="py-2 px-2">
+            <div class="border border-gray-200 dark:border-dark-third border-l-0 border-r-0 py-1 options_post">
+                <div class="grid grid-cols-3 gap-1 place-items-center">
+                    <div class="w-full">
+                        {% if like %}
+                        <button type="button"
+                            class="flex space-x-2 w-full justify-center items-center hover:bg-gray-100 bg-blue-600/20 text-blue-400 dark:bg-blue-600/20 dark:text-blue-400 dark:hover:bg-dark-third text-xl py-2 px-2 rounded-md cursor-pointer btn_like">
+                            <div class="relative flex">
+                                <i class="bx bx-like absolute inline-flex opacity-75 btn_like ping-like "></i>
+                                <i class='bx bx-like btn_like'></i>
+                            </div>
+                            <p class="text-sm font-semibold btn_like">Like</p>
+                        </button>
+                        {% else %}
+                        <button type="button"
+                            class="relative flex space-x-2 w-full justify-center items-center hover:bg-gray-100 dark:text-dark-txt dark:hover:bg-dark-third text-xl py-2 px-2 rounded-md cursor-pointer text-gray-500 btn_like">
+                            <div class="relative flex">
+                                <i class="bx bx-like absolute inline-flex opacity-75 btn_like ping-like"></i>
+                                <i class='bx bx-like btn_like'></i>
+                            </div>
+                            <p class="text-sm font-semibold btn_like">Like</p>
+                        </button>
+                        {% endif %}
+                    </div>
+                    <div class="w-full">
+                        {% if dislike %}
+                        <button type="button"
+                            class="flex space-x-2 w-full justify-center items-center hover:bg-gray-100 text-red-400 bg-red-600/20 dark:bg-red-600/20 dark:text-red-400 dark:hover:bg-dark-third text-xl py-2 px-2 rounded-md cursor-pointer btn_dislike">
+                            <div class="relative flex">
+                                <i class="bx bx-dislike absolute inline-flex opacity-75 btn_dislike ping-like "></i>
+                                <i class='bx bx-dislike btn_like'></i>
+                            </div>
+                            <p class="text-sm font-semibold btn_dislike">Dislike</p>
+                        </button>
+                        {% else %}
+                        <button type="button"
+                            class="flex space-x-2 w-full justify-center items-center hover:bg-gray-100 dark:text-dark-txt dark:hover:bg-dark-third text-xl py-2 px-2 rounded-md cursor-pointer text-gray-500 btn_dislike">
+                            <div class="relative flex">
+                                <i class="bx bx-dislike absolute inline-flex opacity-75 btn_dislike ping-like "></i>
+                                <i class='bx bx-dislike btn_like'></i>
+                            </div>
+                            <p class="text-sm font-semibold btn_dislike">Dislike</p>
+                        </button>
+                        {% endif %}
+                    </div>
+                    <div class="w-full">
+                        <button @click="open=true"
+                            class="flex space-x-2 w-full justify-center items-center hover:bg-gray-100 dark:hover:bg-dark-third text-xl py-2 px-2 rounded-md cursor-pointer text-gray-500 dark:text-dark-txt add_comment">
+                            <i class='bx bx-comment add_comment'></i>
+                            <span class="text-sm font-semibold add_comment">Comment</span>
+                        </button>
+                    </div>
+                    <!--COMMENT MODAL-->
+                </div>
+            </div>
+        </div>
+        <!-- LIST COMMENT -->
+        <div class="py-2 px-2 max-w-full content_comment max-h-96 sm:overflow-x-auto lg:overflow-x-hidden overflow-y-auto" id="content_comment"> 
+            
+            
+        </div>
+        {% include 'comment_modal.html' %}
+    </div>
+
+</div>
+{% endblock content %}
+<!-- right content -->
+{% block right_sidebar %}
+{% endblock right_sidebar %}
+<!-- FOOTER -->
+{% block footer %}
+
+{% endblock footer %}
+
+{% block javascript %}
+<script src="{% static 'js/comment.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/load_comments.js' %}" type="text/javascript"></script>
+<script>
+    loadComments();
+</script>
+{% endblock javascript %}
+
+<!-- <div class="flex space-x-2 comment py-1" data-id="162">
+    <a href="/users/profile/admin/">
+        <img src="/media/users/admin/profile.jpg" alt="Profile picture" class="w-9 h-9 rounded-full">
+    </a>
+    <div>
+        <div class="bg-gray-100 dark:bg-dark-third p-2 rounded-2xl text-sm max-w-120">
+            <a href="/users/profile/admin/" class="font-semibold block hover:text-blue-500 dark:text-dark-txt w-16">
+                <p>admin</p>
+            </a>
+            <div class="bg-blue-600/20 text-blue-400 border-l-2 border-blue-600 p-1 my-1 rounded-md text-xs"">
+                <p class="pb-1 font-medium">test</p>
+                <p class="dark:text-dark-txt text_comment overflow-hidden overflow-ellipsis whitespace-nowrap">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Tenetur sit vitae expedita est fugit repellat vero, itaque minima id consectetur non fugiat delectus facilis ducimus ipsum nobis quas dolorum assumenda!</p>
+            </div>
+            <span class="dark:text-dark-txt text_comment">Lorem, ipsum dolor sit amet consectetur adipisicing elit. In alias error beatae quaerat eveniet adipisci dolores voluptate nulla quisquam consequuntur! Expedita quo quae quis natus eos? Quas esse nulla beatae.</span>
+            <span class="text-xs dark:text-dark-txt text-gray-500 float-right pl-2 pt-1">3&nbsp;days, 2&nbsp;hours</span>
+        </div>
+        <div class=" text-xs text-gray-500 dark:text-dark-txt mt-1 options">
+            <div class="inline-flex">
+                <button type="button" class=" flex space-x-1 justify-center items-center hover:bg-gray-100 dark:hover:bg-dark-third text-xs py-1 px-1 rounded-lg cursor-pointer text-gray-500 dark:text-dark-txt edit">
+                    <i class="bx bxs-edit-alt"></i> <span>Edit</span>
+                    <p class="text-sm font-semibold"></p>
+                </button>
+            </div>
+            <div class="inline-flex">
+                <button type="button" class=" flex space-x-1 justify-center items-center hover:bg-gray-100 dark:hover:bg-dark-third text-xs py-1 px-1 rounded-lg cursor-pointer text-gray-500 dark:text-dark-txt delete">
+                    <i class="bx bxs-trash-alt delete"></i> <span class="delete">Delete</span>
+                    <p class="text-sm font-semibold"></p>
+                </button>
+            </div>                        
+            <div class="inline-flex">
+                <button type="button" class=" flex space-x-2 justify-center items-center hover:bg-gray-100 dark:hover:bg-dark-third text-xs py-1 px-1 rounded-lg cursor-pointer text-gray-500 dark:text-dark-txt">
+                    <i class="bx bxs-like"></i><span>0</span>
+                    <p class="text-sm font-semibold"></p>
+                </button>
+            </div>
+            <div class="inline-flex">
+                <button type="button" class=" flex space-x-2 justify-center items-center hover:bg-gray-100 dark:hover:bg-dark-third text-xs py-1 px-1 rounded-lg cursor-pointer text-gray-500 dark:text-dark-txt">
+                    <i class="bx bxs-dislike"></i><span>0</span>
+                    <p class="text-sm font-semibold"></p>
+                </button>
+            </div>
+            <button @click="open = true" class="inline-flex space-x-2 justify-center items-center hover:bg-gray-100 dark:hover:bg-dark-third text-xs py-1 px-1 rounded-lg cursor-pointer text-gray-500 dark:text-dark-txt reply">
+                <i class="mr-1 bx bxs-comment"></i> Reply
+            </button>
+        </div>
+        <div class="content_reply">
+             
+        </div>  
+    </div>
+</div> -->

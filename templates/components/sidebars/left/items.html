@@ -1,0 +1,15 @@
+<ul class="p-4">
+    <li>
+        <a href="{% url 'accounts:profile' request.user.username %}" class="flex items-center space-x-2 p-2 hover:bg-gray-200 rounded-lg transition-all dark:text-dark-txt dark:hover:bg-dark-third">
+            <img src="{{request.user.profile.image.url}}" alt="Profile picture" class="w-10 h-10 rounded-full">
+            <span class="font-semibold">{{request.user.username}}</span>
+        </a>
+    </li>
+    <li>
+        <a href="#"
+            class="flex items-center space-x-2 p-2 hover:bg-gray-200 rounded-lg transition-all dark:text-dark-txt dark:hover:bg-dark-third">
+            <i class='bx bxs-user-circle text-gray-500 text-2xl'></i>
+            <span class="font-semibold">Friends</span>
+        </a>
+    </li>
+</ul>

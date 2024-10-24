@@ -1,0 +1,22 @@
+{% load static %}
+<footer class="bg-white dark:bg-dark-second h-max md:h-14 w-full shadow flex flex-col md:flex-row items-center justify-center md:justify-between fixed bottom-0 z-50 border-b dark:border-dark-third">
+  <a href="#">Privacy</a>
+    <span>.</span>
+  <a href="#">Terms</a>
+    <span>.</span>
+  <a href="#">Billing</a>
+    <span>.</span>
+  <a href="#">Subscriptions</a>
+
+  <span>.</span>
+  <a href="#">Cookies</a>
+  <span>.</span>
+
+  {% if user.is_authenticated %}
+    <a class="hover:underline" href="{% url 'account_logout' %}">Logout</a>
+  {% endif %}
+
+  <p class="cursor-default text-xs text-gray-100 dark:text-dark-txt">
+    Sachsen Cob&uumlrg Gotha &copy; 2021
+  </p>
+</footer>

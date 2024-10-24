@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load tailwind_tags %}
+{% load tailwind_filters %}
+
+{% block title %}{{user.username}}New Post for Fans{% endblock title %}
+{% block extra_head %}{% endblock extra_head %}
+
+<!-- NAVBAR -->
+{% block navbar %}
+{% include 'components/navbar.html' %}
+{% endblock navbar %}
+
+
+<!-- MAIN -->
+<!-- left sidebar -->
+{% block left_sidebar %}
+{% include 'components/sidebars/left/sidebar.html' %}
+{% endblock left_sidebar %}
+
+<!-- main content -->
+{% block content %}
+<div>
+  <div class="bg-white dark:bg-dark-second shadow px-4 py-5 sm:rounded-lg sm:p-6">
+    <div class="md:grid md:grid-cols-1 md:gap-6">
+      <div class="md:col-span-full">
+        <h3 class="text-lg font-medium leading-6 dark:text-dark-txt text-gray-900"><i class='bx bxs-edit-alt'></i> Edit
+          Post</h3>
+        <p class="mt-1 text-sm dark:text-dark-txt text-gray-500">
+          This information will be displayed publicly so be careful what you share.
+        </p>
+      </div>
+
+      <div class="mt-5 w-full md:mt-0 md:col-span-2">
+        <!-- POST IMAGE -->
+        {% if object.image.count == 1 %}
+        <div class="py-2">
+          {% for img in object.image.all %}
+          <img class="w-20 h-20" src="{{img.image.url}}" alt="Post image">
+          {% endfor %}
+        </div>
+        {% endif %}
+        <!-- END POST IMAGE -->
+        <!-- POST MULTIPLE IMAGE -->
+        {% if object.image.count > 1 %}
+        <div class="py-2">
+          <div class="grid grid-cols-3 gap-0 place-items-center">
+            {% for img in object.image.all %}
+            <img class="w-24 h-24 rounded-sm" src="{{ img.image.url }}" alt="Post image">
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+        <!-- END POST IMAGE -->
+        <form method="POST" enctype="multipart/form-data" id="form_post" class="mt-2">
+          {% csrf_token %}
+          <div class="col-span-full mt-3">
+            <label class="block text-sm font-medium leading-6 dark:text-dark-txt text-gray-900">
+              Images
+            </label>
+            <div>{{form.image}}</div>
+          </div>
+          <div class="col-span-full mt-2">
+            <label for="body" class="block text-sm font-medium leading-6 dark:text-dark-txt text-gray-900">Body</label>
+              {{form.body}}
+          </div>
+          <div class="pt-5">
+            <div class="flex justify-end">
+              <a href="/" type="button"
+                class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Cancel
+              </a>
+              <button type="submit"
+                class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Save
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+<!-- FOOTER -->
+{% block footer %}
+
+{% endblock footer %}
+
+
+{% block javascript %}
+
+{% endblock javascript %}
